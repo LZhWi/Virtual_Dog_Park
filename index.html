@@ -40,6 +40,32 @@
         </article>
       </div>
     </section>
+    <section class="card pet-section" aria-labelledby="pet-heading">
+      <h2 id="pet-heading">My Virtual Dog</h2>
+      <form id="adoption-form">
+        <label for="breed">Choose a breed</label>
+        <select id="breed">
+          <option>Beagle</option>
+          <option>Golden Retriever</option>
+          <option>Poodle</option>
+        </select>
+        <label for="dog-name">Dog name (up to 20 characters)</label>
+        <input id="dog-name" maxlength="20" autocomplete="off" aria-describedby="name-error">
+        <p id="name-error" role="alert"></p>
+        <button type="submit">Adopt</button>
+      </form>
+      <div id="pet-panel" hidden>
+        <h3 id="pet-name"></h3>
+        <p>Breed <strong id="pet-breed"></strong></p>
+        <p>Day <strong id="pet-day"></strong></p>
+        <p>Growth stage <strong id="pet-stage"></strong></p>
+        <p>Happiness <strong id="pet-happiness"></strong> / 100</p>
+        <div class="actions">
+          <button id="feed" type="button">Feed</button>
+          <button id="play" type="button">Play</button>
+        </div>
+      </div>
+    </section>
   </main>
   <footer>Made for AIE1101 · One small step, one happy dog.</footer>
 </body>

@@ -41,6 +41,37 @@ async function main() {
       assert.match(await image.getAttribute("alt"), /Illustration of/);
       assert.ok(await image.evaluate(img => img.complete && img.naturalWidth > 0));
     }
+    if (round >= 2) {
+      await page.getByRole("button", { name: "Adopt", exact: true }).click();
+      assert.match(await page.locator("#name-error").innerText(), /1 to 20/);
+      await page.locator("#dog-name").fill("   ");
+      await page.getByRole("button", { name: "Adopt", exact: true }).click();
+      assert.ok(await page.locator("#adoption-form").isVisible());
+      await page.locator("#dog-name").fill("");
+      await page.locator("#dog-name").pressSequentially("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+      assert.equal((await page.locator("#dog-name").inputValue()).length, 20);
+      for (const breed of ["Beagle", "Golden Retriever", "Poodle"]) {
+        await page.locator("#breed").selectOption(breed);
+        await page.locator("#dog-name").fill("  <Buddy & Co>  ");
+        await page.getByRole("button", { name: "Adopt", exact: true }).click();
+        assert.equal(await page.locator("#pet-name").innerText(), "<Buddy & Co>");
+        assert.equal(await page.locator("#pet-name *").count(), 0);
+        assert.equal(await page.locator("#pet-breed").innerText(), breed);
+        await page.reload();
+      }
+      await page.locator("#dog-name").fill("Buddy");
+      await page.getByRole("button", { name: "Adopt", exact: true }).click();
+      assert.equal(await page.locator("#pet-day").innerText(), "1");
+      assert.equal(await page.locator("#pet-stage").innerText(), "Puppy");
+      assert.equal(await page.locator("#pet-happiness").innerText(), "50");
+      assert.ok(await page.locator("#adoption-form").isHidden());
+      await page.locator("#feed").click();
+      assert.equal(await page.locator("#pet-happiness").innerText(), "60");
+      await page.locator("#play").click();
+      assert.equal(await page.locator("#pet-happiness").innerText(), "70");
+      for (let click = 0; click < 6; click++) await page.locator("#play").click();
+      assert.equal(await page.locator("#pet-happiness").innerText(), "100");
+    }
     await page.screenshot({ path: path.join(results, "round-" + round + "-desktop.png"), fullPage: true });
     await page.setViewportSize({ width: 375, height: 812 });
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
@@ -51,6 +82,9 @@ async function main() {
     assert.deepEqual(errors, []);
     const report = { round, passed: true, browser: await browser.version(),
       checks: ["three breeds", "three local images and alt text", "375px stacked layout", "no JavaScript errors"] };
+    if (round >= 2) report.checks.push("blank names rejected", "20-character input limit",
+      "trimmed names and literal special characters", "all three breeds adopt",
+      "Day 1 Puppy starts at 50", "Feed and Play add 10 and cap at 100");
     fs.writeFileSync(path.join(results, "round-" + round + ".json"), JSON.stringify(report, null, 2));
     console.log(JSON.stringify(report, null, 2));
   } finally {

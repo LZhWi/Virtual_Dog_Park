@@ -17,6 +17,16 @@ h3 { margin: 12px 0; font-size: 1.25rem; }
 .card img { display: block; width: 100%; height: 180px; background: #f0f2e7; border-radius: 12px; }
 .card p { margin: 8px 0; }
 footer { padding: 36px 0; color: #536458; }
+.pet-section { margin-top: 32px; }
+.pet-section h2 { margin-top: 0; }
+label { display: block; font-weight: 600; margin: 12px 0 6px; }
+input, select, button { font: inherit; }
+input, select { width: min(100%, 400px); padding: 10px; border: 1px solid #788b7a; border-radius: 8px; }
+button { background: #315f42; color: white; border: 0; border-radius: 8px; padding: 10px 20px; cursor: pointer; }
+button:hover { background: #23482f; }
+:focus-visible { outline: 3px solid #9b5e0d; outline-offset: 3px; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+#name-error { color: #a12525; min-height: 1.6em; }
 @media (max-width: 720px) {
   .breed-grid { grid-template-columns: 1fr; }
   header { padding-top: 28px; }
