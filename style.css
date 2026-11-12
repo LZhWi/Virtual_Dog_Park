@@ -27,6 +27,8 @@ button:hover { background: #23482f; }
 :focus-visible { outline: 3px solid #9b5e0d; outline-offset: 3px; }
 .actions { display: flex; flex-wrap: wrap; gap: 10px; }
 #name-error { color: #a12525; min-height: 1.6em; }
+progress { display: block; width: min(100%, 400px); height: 20px; accent-color: #315f42; }
+.secondary { background: #59645c; }
 @media (max-width: 720px) {
   .breed-grid { grid-template-columns: 1fr; }
   header { padding-top: 28px; }

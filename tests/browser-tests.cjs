@@ -58,6 +58,12 @@ async function main() {
         assert.equal(await page.locator("#pet-name *").count(), 0);
         assert.equal(await page.locator("#pet-breed").innerText(), breed);
         await page.reload();
+        if (round >= 3) {
+          assert.equal(await page.locator("#pet-name").innerText(), "<Buddy & Co>");
+          assert.equal(await page.locator("#pet-breed").innerText(), breed);
+          await page.evaluate(() => localStorage.removeItem("virtualDogParkPetV1"));
+          await page.reload();
+        }
       }
       await page.locator("#dog-name").fill("Buddy");
       await page.getByRole("button", { name: "Adopt", exact: true }).click();
@@ -65,12 +71,54 @@ async function main() {
       assert.equal(await page.locator("#pet-stage").innerText(), "Puppy");
       assert.equal(await page.locator("#pet-happiness").innerText(), "50");
       assert.ok(await page.locator("#adoption-form").isHidden());
+      if (round >= 3) {
+        await page.reload();
+        assert.equal(await page.locator("#pet-name").innerText(), "Buddy");
+        assert.equal(await page.locator("#pet-happiness").innerText(), "50");
+      }
       await page.locator("#feed").click();
+      if (round >= 3) await page.reload();
       assert.equal(await page.locator("#pet-happiness").innerText(), "60");
       await page.locator("#play").click();
+      if (round >= 3) await page.reload();
       assert.equal(await page.locator("#pet-happiness").innerText(), "70");
       for (let click = 0; click < 6; click++) await page.locator("#play").click();
       assert.equal(await page.locator("#pet-happiness").innerText(), "100");
+    }
+    if (round >= 3) {
+      assert.equal(await page.locator("#growth").evaluate(bar => bar.value), 1);
+      for (const [day, stage, happiness, growth] of [
+        [2, "Young Dog", 95, "2"], [3, "Young Dog", 90, "2"], [4, "Adult Dog", 85, "3"],
+      ]) {
+        await page.locator("#next-day").click();
+        await page.reload();
+        assert.equal(await page.locator("#pet-day").innerText(), String(day));
+        assert.equal(await page.locator("#pet-stage").innerText(), stage);
+        assert.equal(await page.locator("#pet-happiness").innerText(), String(happiness));
+        assert.equal(await page.locator("#growth").evaluate(bar => bar.value), Number(growth));
+      }
+      await page.locator("#feed").click();
+      await page.reload();
+      assert.equal(await page.locator("#pet-happiness").innerText(), "95");
+      const beforeCancel = await page.evaluate(() => localStorage.getItem("virtualDogParkPetV1"));
+      page.once("dialog", dialog => dialog.dismiss());
+      await page.locator("#start-over").click();
+      await page.reload();
+      assert.equal(await page.evaluate(() => localStorage.getItem("virtualDogParkPetV1")), beforeCancel);
+      assert.equal(await page.locator("#pet-name").innerText(), "Buddy");
+      for (let day = 0; day < 21; day++) await page.locator("#next-day").click();
+      await page.reload();
+      assert.equal(await page.locator("#pet-happiness").innerText(), "0");
+      assert.equal(await page.locator("#pet-stage").innerText(), "Adult Dog");
+      page.once("dialog", dialog => dialog.accept());
+      await page.locator("#start-over").click();
+      await page.reload();
+      assert.ok(await page.locator("#adoption-form").isVisible());
+      assert.equal(await page.evaluate(() => localStorage.getItem("virtualDogParkPetV1")), null);
+      // Leave a Day 4 dog visible for the screenshots.
+      await page.locator("#dog-name").fill("Buddy");
+      await page.getByRole("button", { name: "Adopt", exact: true }).click();
+      for (let day = 0; day < 3; day++) await page.locator("#next-day").click();
     }
     await page.screenshot({ path: path.join(results, "round-" + round + "-desktop.png"), fullPage: true });
     await page.setViewportSize({ width: 375, height: 812 });
@@ -85,6 +133,10 @@ async function main() {
     if (round >= 2) report.checks.push("blank names rejected", "20-character input limit",
       "trimmed names and literal special characters", "all three breeds adopt",
       "Day 1 Puppy starts at 50", "Feed and Play add 10 and cap at 100");
+    if (round >= 3) report.checks.push("refresh restores adoption, Feed, Play and Next Day",
+      "Day 2 and 3 Young Dog; Day 4 Adult Dog", "three distinct growth bar values",
+      "Next Day subtracts 5 and stops at zero", "Cancel preserves saved dog",
+      "Confirm clears saved dog across refresh");
     fs.writeFileSync(path.join(results, "round-" + round + ".json"), JSON.stringify(report, null, 2));
     console.log(JSON.stringify(report, null, 2));
   } finally {
