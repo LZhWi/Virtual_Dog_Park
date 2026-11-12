@@ -1,0 +1,23 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #26382e;
+  background: #f6f5ed;
+  line-height: 1.6;
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+header, main, footer { width: min(1080px, 92%); margin: auto; }
+header { padding: 48px 0 24px; }
+h1 { font-size: clamp(2rem, 5vw, 3.4rem); line-height: 1.15; margin: 12px 0; }
+h2 { font-size: 1.7rem; }
+h3 { margin: 12px 0; font-size: 1.25rem; }
+.eyebrow { color: #476950; font-weight: 700; }
+.breed-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.card { padding: 24px; background: white; border: 1px solid #d8dfd4; border-radius: 18px; }
+.card img { display: block; width: 100%; height: 180px; background: #f0f2e7; border-radius: 12px; }
+.card p { margin: 8px 0; }
+footer { padding: 36px 0; color: #536458; }
+@media (max-width: 720px) {
+  .breed-grid { grid-template-columns: 1fr; }
+  header { padding-top: 28px; }
+}
