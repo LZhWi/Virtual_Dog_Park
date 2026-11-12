@@ -6,7 +6,7 @@ const path = require("node:path");
 const { chromium } = require("playwright");
 
 const root = path.resolve(__dirname, "..");
-const round = Number(process.argv[2] || 1);
+const round = Number(process.argv[2] || 3);
 const results = path.join(__dirname, "results");
 fs.mkdirSync(results, { recursive: true });
 
